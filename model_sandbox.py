@@ -16,6 +16,7 @@ dc = DataCleaner(questions)
 
 X, y = dc.get_clean()
 
+# create cross-validation subsets
 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=.8,
                                                     random_state=123)
 
@@ -35,6 +36,19 @@ lr = LinearRegression()
 lr.fit(X_train_reg, y_train)
 lr.predict(X_train_reg)
 lr.score(X_train_reg, y_train)
+
+
+def baseline_model(X_train):
+    '''
+    Predicts the score for a post, always predicts the average of the
+    normalized scores.
+
+    RETURNS:
+        r-squared score for the baseline predictions.
+    '''
+    avg_normed_score = X_train['normed_score'].mean
+    y_prediction = [avg_normed_score for row in xrange(len(X_train))]
+    return r2_score(X_train['normed_score'], y_prediction)
 
 
 # Test RF with defaults for un-cleaned data with 1000 rows, no added features:

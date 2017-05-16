@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
-from sklearn.pipeline import Pipeline
-import re
 from sklearn.model_selection import train_test_split
+import re
 
 
 class DataCleaner(object):
@@ -9,24 +8,22 @@ class DataCleaner(object):
     Class to clean StackOverflow data.
     """
 
-    def __init__(self, df, training=True, predict=False):
+    def __init__(self, df, training=True, simple_regression=True):
         self.df = df
+        self.simple_regression = simple_regression
 
-        if not predict:  # if training model
-            self.df['normed_score'] = self.df.score/self.df.view_count
-            indicies = xrange(len(df))
-            X_train, X_test = train_test_split(indicies, train_size=.8,
-                                               random_state=123)
-            training_data = self.df.iloc[X_train, :]
-            test_data = self.df.iloc[X_test, :]
+        self.df['normed_score'] = self.df.score/self.df.view_count
+        indicies = xrange(len(df))
+        X_train, X_test = train_test_split(indicies, train_size=.8,
+                                           random_state=123)
+        training_data = self.df.iloc[X_train, :]
+        test_data = self.df.iloc[X_test, :]
 
-            if training:
-                self.df = training_data
-            else:
-                print "Using test data"
-                self.df = test_data
-        else:  # if we are predicting
-            self.df = df
+        if training:
+            self.df = training_data
+        else:  # testing
+            print "Using test data"
+            self.df = test_data
 
     def extract_code_for_col(self):
         '''
@@ -135,9 +132,17 @@ class DataCleaner(object):
 
     def nan_to_zero(self):
         '''
-        For NaN values, converts to zero.
+        Converts all NaNs to zero.
         '''
         self.df.fillna(0, inplace=True)
+
+    def only_numeric(self):
+        '''
+        Drops all unique or non-numeric columns for simple regression.
+        '''
+        to_drop = ['id', 'accepted_answer_id', 'body', 'code', 'tags', 'title']
+        for col in to_drop:
+            self.df = self.df.drop(col, axis=1)
 
     def get_clean(self):
         '''
@@ -145,13 +150,20 @@ class DataCleaner(object):
         '''
         self.extract_code_for_col()
         self.transform_tags()
-        #  self.text_parse()
         self.check_value_range()
         self.add_length_cols()
         self.dumify_code()
+        self.parse_datetime_cols()
         self.nan_to_zero()
         self.drop_leaky_columns()
 
+        if self.simple_regression:  # if simple regression is true
+            self.only_numeric()
+        else:
+            self.text_parse()
+            self.nlp_features()
+
+        # if training = True, y = y_train, X = X_train
         y = self.df.pop('normed_score')
         X = self.df
 

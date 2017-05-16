@@ -38,4 +38,4 @@ def create_questions_df():
     return questions_df
 
 
-# q = create_questions_df()
+q = create_questions_df()
