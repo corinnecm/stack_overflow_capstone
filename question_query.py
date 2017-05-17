@@ -29,7 +29,12 @@ def create_questions_df():
                         ORDER BY RANDOM()
                         LIMIT 1000;""")
 
-    q = cur.execute(questions_query)
+    try:
+        q = cur.execute(questions_query)
+    except Exception as e:
+        print e.message
+        conn.rollback()  # Rollback to prevent session locking out
+
     questions_df = pd.DataFrame(cur.fetchall(), columns=['id', 'accepted_answer_id',
                         'answer_count', 'body', 'comment_count', 'favorite_count',
                         'score', 'tags', 'title', 'view_count', 'bounty_amount'])

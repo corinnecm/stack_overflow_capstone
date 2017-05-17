@@ -28,7 +28,7 @@ def create_answers_df():
                         ORDER BY RANDOM()
                         LIMIT 1000;""")
 
-    a = cur.execute(super_a_query)
+    a = cur.execute(answers_query)
     answers_df = pd.DataFrame(cur.fetchall(), columns=['id', 'body',
                                 'comment_count', 'parent_id', 'score',
                                 'view_count', 'bounty_amount'])
