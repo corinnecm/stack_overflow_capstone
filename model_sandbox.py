@@ -1,7 +1,9 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 
 from question_query import create_questions_df
 from answer_query import create_answers_df
@@ -10,35 +12,33 @@ from data_cleaning import DataCleaner
 # %load_ext autoreload
 # %autoreload 2
 
-questions = create_questions_df()
+q = create_questions_df()
+a = create_answers_df()
 
-dc = DataCleaner(questions)
+dc_train = DataCleaner(questions)
+dc_test = DataCleaner(question, training=False)
 
-X, y = dc.get_clean()
+X_train, y_train = dc_train.get_clean()
+X_test, y_test = dc_test.get_clean()
 
-# create cross-validation subsets
-X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=.8,
-                                                    random_state=123)
-
-X_train_reg = X_train[['answer_count', 'comment_count', 'favorite_count',
-                       'bounty_amount', 'code_yn', 'title_length',
-                       'body_length']]
 
 rfr = RandomForestRegressor()
+rfr.fit(X_train, y_train)
+rf_pred = rfr.predict(X_train)
+print('RF R-sq: ' + rf.score(X_test, y_test))
+print('RF MSE: ' + mean_squared_error(y_test, rf_pred))
 
-rfr.fit(X_train_reg, y_train)
-rfr.predict(X_train_reg)
-rfr.score(X_train_reg, y_train)
-rfr.feature_importances_
 
 lr = LinearRegression()
+lr.fit(X_train, y_train)
+lr_pred = lr.predict(X_train)
+print('LR R-sq: ' + lr.score(X_test, y_test))
+print('LR MSE: ' + mean_squared_error(y_test, lr_pred))
 
-lr.fit(X_train_reg, y_train)
-lr.predict(X_train_reg)
-lr.score(X_train_reg, y_train)
+baseline_model(y_train)
 
 
-def baseline_model(X_train):
+def baseline_model(y_train):
     '''
     Predicts the score for a post, always predicts the average of the
     normalized scores.
@@ -46,27 +46,7 @@ def baseline_model(X_train):
     RETURNS:
         r-squared score for the baseline predictions.
     '''
-    avg_normed_score = X_train['normed_score'].mean
-    y_prediction = [avg_normed_score for row in xrange(len(X_train))]
-    return r2_score(X_train['normed_score'], y_prediction)
-
-
-# Test RF with defaults for un-cleaned data with 1000 rows, no added features:
-# In [13]: rfr.score(X_test[['answer_count', 'comment_count', 'favorite_count',
-# 'view_count']], X_test['score'])
-# Out[13]: 0.58460069056804376
-
-# RF with defaults for cleaned data with 1000 rows, features: answer_count,
-# comment_count, favorite_count, bounty_amount, code_yn, title_length,
-# body_length
-# In [58]: rfr.score(X_train_reg, y_train)
-# Out[58]: 0.772954675196411
-# In [59]: rfr.feature_importances_
-# Out[59]:
-# array([  7.02753142e-02,   1.21382436e-01,   6.86715724e-02,
-#          3.84836585e-06,   6.94508367e-02,   2.81402918e-01,
-#          3.88813075e-01])
-
-# To check for NaN/Null:
-# pd.isnull(df).sum() > 0
-# df.loc[:, df.isnull().any()]
+    avg_normed_score = y_train.mean()
+    y_pred = [avg_normed_score for row in xrange(len(y_train))]
+    print('R-squared: ' + r2_score(y_train, y_pred))
+    print('MSE: ' + mean_squared_error(y_train, y_pred))

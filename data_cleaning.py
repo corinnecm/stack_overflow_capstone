@@ -140,9 +140,30 @@ class DataCleaner(object):
         '''
         Drops all unique or non-numeric columns for simple regression.
         '''
-        to_drop = ['id', 'accepted_answer_id', 'body', 'code', 'tags', 'title']
+        to_drop = ['id', 'accepted_answer_id', 'body', 'code', 'tags',
+                   'tags_list', 'title']
         for col in to_drop:
             self.df = self.df.drop(col, axis=1)
+
+    def num_tags(self):
+        '''
+        Adds column that contains the number of tags per post.
+        '''
+        num_tags = []
+        for tag in self.df['tags_list']:
+            num_tags.append(len(tag))
+        self.df['num_tags'] = num_tags
+
+    def num_paragraphs(self):
+        '''
+        Adds column that contains the number of paragraphs
+        in the body of the post.
+        '''
+        paragraphs = []
+        for row in self.df['body']:
+            paragraph = re.findall("<p>", str(row))
+            paragraphs.append(len(paragraph))
+        self.df['num_paragraphs'] = paragraphs
 
     def get_clean(self):
         '''
@@ -156,6 +177,8 @@ class DataCleaner(object):
         self.parse_datetime_cols()
         self.nan_to_zero()
         self.drop_leaky_columns()
+        self.num_tags()
+        self.num_paragraphs()
 
         if self.simple_regression:  # if simple regression is true
             self.only_numeric()

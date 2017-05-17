@@ -35,6 +35,3 @@ def create_answers_df():
     conn.commit()
     conn.close()
     return answers_df
-
-
-# a = create_answers_df()

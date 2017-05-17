@@ -20,7 +20,7 @@ def create_questions_df():
                             dbname=os.getenv('DBNAME'))
     cur = conn.cursor()
     questions_query = ("""SELECT posts.id, accepted_answer_id, answer_count, body,
-                        comment_count, favorite_count, score, tags,  title,
+                        comment_count, favorite_count, score, tags, title,
                         view_count, bounty_amount
                         FROM posts
                         JOIN votes
@@ -36,6 +36,3 @@ def create_questions_df():
     conn.commit()
     conn.close()
     return questions_df
-
-
-q = create_questions_df()
