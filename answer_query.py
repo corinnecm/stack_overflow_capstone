@@ -20,7 +20,7 @@ def create_answers_df():
                             dbname=os.getenv('DBNAME'))
     cur = conn.cursor()
     answers_query = ("""SELECT posts.id, body, comment_count, parent_id, score,
-                        view_count, bounty_amount
+                        view_count, bounty_amount, creation_date
                         FROM posts
                         JOIN votes
                         ON posts.id = votes.post_id
@@ -28,10 +28,16 @@ def create_answers_df():
                         ORDER BY RANDOM()
                         LIMIT 1000;""")
 
-    a = cur.execute(answers_query)
+    try:
+        a = cur.execute(answers_query)
+    except Exception as e:
+        print e.message
+        conn.rollback()  # Rollback to prevent session locking out
+
     answers_df = pd.DataFrame(cur.fetchall(), columns=['id', 'body',
                                 'comment_count', 'parent_id', 'score',
-                                'view_count', 'bounty_amount'])
+                                'view_count', 'bounty_amount', 'creation_date'])
     conn.commit()
+    cur.close()
     conn.close()
     return answers_df

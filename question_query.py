@@ -21,7 +21,7 @@ def create_questions_df():
     cur = conn.cursor()
     questions_query = ("""SELECT posts.id, accepted_answer_id, answer_count, body,
                         comment_count, favorite_count, score, tags, title,
-                        view_count, bounty_amount
+                        view_count, bounty_amount, creation_date
                         FROM posts
                         JOIN votes
                         ON posts.id = votes.post_id
@@ -37,7 +37,9 @@ def create_questions_df():
 
     questions_df = pd.DataFrame(cur.fetchall(), columns=['id', 'accepted_answer_id',
                         'answer_count', 'body', 'comment_count', 'favorite_count',
-                        'score', 'tags', 'title', 'view_count', 'bounty_amount'])
+                        'score', 'tags', 'title', 'view_count', 'bounty_amount',
+                        'creation_date'])
     conn.commit()
+    cur.close()
     conn.close()
     return questions_df

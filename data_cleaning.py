@@ -8,11 +8,13 @@ class DataCleaner(object):
     Class to clean StackOverflow data.
     """
 
-    def __init__(self, df, training=True, simple_regression=True):
+    def __init__(self, df, questions=True, training=True,
+                 simple_regression=True):
         self.df = df
         self.simple_regression = simple_regression
+        self.questions = questions
 
-        self.df['normed_score'] = self.df.score/self.df.view_count
+        # self.df['normed_score'] = self.df.score/self.df.view_count
         indicies = xrange(len(df))
         X_train, X_test = train_test_split(indicies, train_size=.8,
                                            random_state=123)
@@ -50,27 +52,23 @@ class DataCleaner(object):
             tags.append(tag)
         self.df['tags_list'] = tags
 
-    def text_parse(self):
+    def text_parse(self, text_columns):
         '''
         Remove html tags from columns with text.
         '''
         soupy = []
-        text_columns = ['body', 'title']
         for col in text_columns:
             for row in col:
                 soup = BeautifulSoup(row, "html.parser")
                 soupy.append(soup.get_text())
         self.df['parsed_body'] = soupy
 
-    def check_value_range(self):
+    def check_value_range(self, columns):
         '''
-        Make sure that numeric columns have reasonable ranges (usually >0)
+        Make sure that numeric columns have reasonable ranges (usually > 0)
         '''
-        numeric_columns = ['id', 'parent_id', 'accepted_answer_id',
-                           'answer_count', 'comment_count', 'favorite_count',
-                           'view_count']
         rows_to_drop = []
-        for col in numeric_columns:
+        for col in columns:
             for idx, row in enumerate(col):
                 if row < 0:
                     rows_to_drop.append(idx)
@@ -79,18 +77,18 @@ class DataCleaner(object):
     def nlp_features(self):
         pass
 
-    def add_length_cols(self):
+    def add_length_cols(self, len_columns):
         '''
         For columns listed, take the length of the text in each row, add to
         Dataframe as new columns.
         '''
-        title_lengths = []
-        body_lengths = []
-        for title, body in zip(self.df['title'], self.df['body']):
-            title_lengths.append(len(title))
-            body_lengths.append(len(body))
-        self.df['title_length'] = title_lengths
-        self.df['body_length'] = body_lengths
+        for col in len_columns:
+            # lengths = []
+            col_name = str(col)+'_length'
+            self.df[col_name] = self.df[col].apply(len)
+            # for row in col:
+            #     lengths.append(len(row))
+            # self.df[col_name] = lengths
 
     def dumify_code(self):
         '''
@@ -113,15 +111,7 @@ class DataCleaner(object):
         for col in leaky_columns:
             self.df = self.df.drop(col, axis=1)
 
-    def drop_text_columns(self):
-        '''
-        Drop text columns for regression purposes.
-        '''
-        text_columns = ['title', 'body', 'tags']
-        for col in text_columns:
-            self.df = self.df.drop(col, axis=1)
-
-    def parse_datetime_cols(self):
+    def parse_datetime_cols(self, dt_columns):
         '''
         Tranform datetime columns into regression-usable formats.
         '''
@@ -136,13 +126,11 @@ class DataCleaner(object):
         '''
         self.df.fillna(0, inplace=True)
 
-    def only_numeric(self):
+    def only_numeric(self, drop_cols):
         '''
         Drops all unique or non-numeric columns for simple regression.
         '''
-        to_drop = ['id', 'accepted_answer_id', 'body', 'code', 'tags',
-                   'tags_list', 'title']
-        for col in to_drop:
+        for col in drop_cols:
             self.df = self.df.drop(col, axis=1)
 
     def num_tags(self):
@@ -169,25 +157,46 @@ class DataCleaner(object):
         '''
         Runs all pertinent cleaning methods.
         '''
-        self.extract_code_for_col()
-        self.transform_tags()
-        self.check_value_range()
-        self.add_length_cols()
-        self.dumify_code()
-        self.parse_datetime_cols()
-        self.nan_to_zero()
-        self.drop_leaky_columns()
-        self.num_tags()
-        self.num_paragraphs()
+        q_numeric_cols = ['id', 'accepted_answer_id', 'answer_count',
+                          'comment_count', 'favorite_count', 'view_count']
+        q_length_cols = ['body', 'title']
+        q_drop_cols = ['id', 'accepted_answer_id', 'body', 'code', 'tags',
+                       'tags_list', 'title', 'creation_date']
 
-        if self.simple_regression:  # if simple regression is true
-            self.only_numeric()
-        else:
+        a_numeric_cols = ['id', 'answer_count', 'comment_count',
+                          'favorite_count', 'view_count']
+        a_length_cols = ['body']
+        a_drop_cols = ['id', 'body', 'code', 'parent_id', 'creation_date']
+
+        if self.questions and self.simple_regression:
+            self.transform_tags()
+            self.nan_to_zero()
+            self.num_tags()
+            self.extract_code_for_col()
+            self.check_value_range(q_numeric_cols)
+            self.add_length_cols(q_length_cols)
+            self.dumify_code()
+            # self.parse_datetime_cols()
+            self.num_paragraphs()
+            self.only_numeric(q_drop_cols)
+            # self.drop_leaky_columns()
+
+        elif not self.questions and self.simple_regression:  # if answers
+            self.nan_to_zero()
+            self.extract_code_for_col()
+            self.check_value_range(a_numeric_cols)
+            self.add_length_cols(a_length_cols)
+            self.dumify_code()
+            # self.parse_datetime_cols()
+            self.num_paragraphs()
+            self.only_numeric(a_drop_cols)
+
+        else:  # if not regression
             self.text_parse()
             self.nlp_features()
 
         # if training = True, y = y_train, X = X_train
-        y = self.df.pop('normed_score')
+        y = self.df.pop('score')
         X = self.df
 
         return X, y
