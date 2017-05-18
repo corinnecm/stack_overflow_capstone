@@ -117,7 +117,7 @@ class DataCleaner(object):
         #                  'last_edit_date']
         month = []
         for col in mo_columns:
-            col_name = str(col)'_month'
+            col_name = str(col)+'_month'
             self.df[col_name] = self.df[col].dt.month
 
     def nan_to_zero(self):
