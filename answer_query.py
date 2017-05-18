@@ -14,7 +14,7 @@ import sys
 #                     sys.stdout.flush()
 
 
-def create_answers_df():
+def create_answers_df(row_limit):
     conn = psycopg2.connect(user=os.getenv('USER'), host=os.getenv('HOST'),
                             password=os.getenv('PASSWORD'),
                             dbname=os.getenv('DBNAME'))
@@ -26,7 +26,7 @@ def create_answers_df():
                         ON posts.id = votes.post_id
                         WHERE post_type_id=2
                         ORDER BY RANDOM()
-                        LIMIT 1000;""")
+                        LIMIT {};""").format(row_limit)
 
     try:
         a = cur.execute(answers_query)

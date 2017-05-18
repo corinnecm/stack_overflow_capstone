@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from datetime import datetime
 from sklearn.model_selection import train_test_split
 import re
 
@@ -83,12 +84,8 @@ class DataCleaner(object):
         Dataframe as new columns.
         '''
         for col in len_columns:
-            # lengths = []
             col_name = str(col)+'_length'
             self.df[col_name] = self.df[col].apply(len)
-            # for row in col:
-            #     lengths.append(len(row))
-            # self.df[col_name] = lengths
 
     def dumify_code(self):
         '''
@@ -111,14 +108,17 @@ class DataCleaner(object):
         for col in leaky_columns:
             self.df = self.df.drop(col, axis=1)
 
-    def parse_datetime_cols(self, dt_columns):
+    def extract_month(self, mo_columns):
         '''
         Tranform datetime columns into regression-usable formats.
         '''
-        datetime_cols = ['closed_date', 'community_owned_date',
-                         'creation_date', 'last_activity_date',
-                         'last_edit_date']
-        pass
+        # datetime_cols = ['closed_date', 'community_owned_date',
+        #                  'creation_date', 'last_activity_date',
+        #                  'last_edit_date']
+        month = []
+        for col in mo_columns:
+            col_name = str(col)'_month'
+            self.df[col_name] = self.df[col].dt.month
 
     def nan_to_zero(self):
         '''
@@ -162,6 +162,7 @@ class DataCleaner(object):
         q_length_cols = ['body', 'title']
         q_drop_cols = ['id', 'accepted_answer_id', 'body', 'code', 'tags',
                        'tags_list', 'title', 'creation_date']
+        q_dt_cols = ['creation_date']
 
         a_numeric_cols = ['id', 'answer_count', 'comment_count',
                           'favorite_count', 'view_count']
@@ -176,7 +177,7 @@ class DataCleaner(object):
             self.check_value_range(q_numeric_cols)
             self.add_length_cols(q_length_cols)
             self.dumify_code()
-            # self.parse_datetime_cols()
+            self.extract_month(q_dt_cols)
             self.num_paragraphs()
             self.only_numeric(q_drop_cols)
             # self.drop_leaky_columns()
@@ -187,7 +188,7 @@ class DataCleaner(object):
             self.check_value_range(a_numeric_cols)
             self.add_length_cols(a_length_cols)
             self.dumify_code()
-            # self.parse_datetime_cols()
+            self.extract_month(q_dt_cols)
             self.num_paragraphs()
             self.only_numeric(a_drop_cols)
 
