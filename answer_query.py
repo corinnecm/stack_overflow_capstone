@@ -3,15 +3,15 @@ import psycopg2
 import os
 import sys
 
-if __name__ == '__main__':
-    if os.path.exists('.env'):
-            print('Detected local .env, importing environment from .env...')
-            for line in open('.env'):
-                var = line.strip().split('=')
-                if len(var) == 2:
-                    os.environ[var[0]] = var[1]
-                    print "Setting environment variable:", var[0]
-                    sys.stdout.flush()
+# if __name__ == '__main__':
+#     if os.path.exists('.env'):
+#             print('Detected local .env, importing environment from .env...')
+#             for line in open('.env'):
+#                 var = line.strip().split('=')
+#                 if len(var) == 2:
+#                     os.environ[var[0]] = var[1]
+#                     print "Setting environment variable:", var[0]
+#                     sys.stdout.flush()
 
 
 def create_answers_df():
@@ -20,7 +20,7 @@ def create_answers_df():
                             dbname=os.getenv('DBNAME'))
     cur = conn.cursor()
     answers_query = ("""SELECT posts.id, body, comment_count, parent_id, score,
-                        view_count, bounty_amount, creation_date
+                        view_count, bounty_amount, posts.creation_date
                         FROM posts
                         JOIN votes
                         ON posts.id = votes.post_id

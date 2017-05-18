@@ -9,6 +9,7 @@ from question_query import create_questions_df
 from answer_query import create_answers_df
 from data_cleaning import DataCleaner
 
+
 class FindOptimalModels(object):
     def __init__(self, X_test, X_train, y_test, y_train, question=True):
         self.X_test = X_test
@@ -17,8 +18,7 @@ class FindOptimalModels(object):
         self.y_train = y_train
         self.question = question
 
-
-    def run_default_models(self, model_list):
+    def run_default_models(self, default_models):
         '''
         For a list of regression models, fits, predicts and scores for
         comparison purposes. Default parameters only.
@@ -31,7 +31,7 @@ class FindOptimalModels(object):
             R-sqared score and MSE for each model in models.
         '''
         fitted_models = []
-        for idx, model in enumerate(model_list):
+        for idx, model in enumerate(default_models):
             mod = model()
             mod.fit(self.X_train, self.y_train)
             rf_pred = mod.predict(self.X_test)
