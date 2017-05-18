@@ -48,7 +48,7 @@ class FindOptimalModels(object):
             fitted_models.append(mod)
         return fitted_models
 
-    def run_grid_search(model_list, params_dict):
+    def run_grid_search(self, model_list, params_dict):
         '''
         Runs grid search for fitted models in model list for comparison
         of optimal models.
