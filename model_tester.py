@@ -131,11 +131,11 @@ def baseline_model(y_train, y_test):
 
 
 if __name__ == '__main__':
-    q = create_questions_df()
+    q = create_questions_df(100000)
     q_train_dc = DataCleaner(q)
     X, y = q_train_dc.get_clean()
 
-    # a = create_answers_df()
+    # a = create_answers_df(100000)
     # a_train_dc = DataCleaner(a)
     # A, b = a_train_dc.get_clean()
     # A_test, A_train, b_test, b_train = train_test_split(A, b, test_size=0.8,
