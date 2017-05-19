@@ -92,7 +92,8 @@ class FindOptimalModels(object):
         optimal_params = []
         params = params_dict.keys()
         for idx, model in enumerate(model_list):
-            gs = GridSearchCV(model, params_dict[params[idx]], n_jobs=-1, cv=3)
+            gs = GridSearchCV(model, params_dict[params[idx]], n_jobs=-1, cv=3,
+                              verbose=3)
             gs.fit(self.X_train, self.y_train)
             output_msg.append('Best parameters for {} are {}'.format(params[idx],
                               gs.best_params_))
