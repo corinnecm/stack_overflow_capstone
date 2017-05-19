@@ -25,7 +25,7 @@ class FindOptimalModels(object):
             self.X = self.X.sort_values('creation_date')
             self.X = self.X.drop('creation_date', axis=1)
             indicies = xrange(len(self.X))
-            split_index = len(self.X)*0.8
+            split_index = int(len(self.X))*0.8
             X_train = self.X.iloc[:split_index, :]
             X_test = self.X.iloc[split_index:, :]
             y_train = self.y.iloc[:split_index, :]
