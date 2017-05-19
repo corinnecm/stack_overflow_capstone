@@ -11,12 +11,37 @@ from data_cleaning import DataCleaner
 
 
 class FindOptimalModels(object):
-    def __init__(self, X_test, X_train, y_test, y_train, question=True):
-        self.X_test = X_test
-        self.X_train = X_train
-        self.y_test = y_test
-        self.y_train = y_train
+    def __init__(self, X, y, question=True, time_split=False):
+        self.X = X
+        self.y = y
         self.question = question
+        self.time_split = time_split
+
+        if time_split:
+            '''
+            Sorts the columns by creation date and assigns the most recent 20
+            percent to be the test set, the drops 'creation_date column.
+            '''
+            self.X = self.X.sort_values('creation_date')
+            self.X = self.X.drop('creation_date', axis=1)
+            indicies = xrange(len(self.X))
+            split_index = len(self.X)*0.8
+            X_train = self.X.iloc[:split_index, :]
+            X_test = self.X.iloc[split_index:, :]
+            y_train = self.y.iloc[:split_index, :]
+            y_test = self.y.iloc[split_index:, :]
+            self.X_train = X_train
+            self.X_test = X_test
+            self.y_train = y_train
+            self.y_test = y_test
+
+        else:
+            X_test, X_train, y_test, y_train = train_test_split(self.X, self.y, test_size=0.8,
+                                                                random_state=123)
+            self.X_train = X_train
+            self.X_test = X_test
+            self.y_train = y_train
+            self.y_test = y_test
 
     def run_default_models(self, default_models):
         '''
@@ -109,8 +134,7 @@ if __name__ == '__main__':
     q = create_questions_df()
     q_train_dc = DataCleaner(q)
     X, y = q_train_dc.get_clean()
-    X_test, X_train, y_test, y_train = train_test_split(X, y, test_size=0.8,
-                                                        random_state=123)
+
     # a = create_answers_df()
     # a_train_dc = DataCleaner(a)
     # A, b = a_train_dc.get_clean()
@@ -124,7 +148,8 @@ if __name__ == '__main__':
                   'gbr': {'learning_rate': [.001, .01, .1, .2], 'max_depth':
                           [2, 3, 5], 'n_estimators': [10, 20, 50, 100, 5000]}}
 
-    finder = FindOptimalModels(X_test, X_train, y_test, y_train, question=True)
+    finder = FindOptimalModels(X_test, X_train, y_test, y_train, question=True,
+                               time_split=True)
     fitted_models = finder.run_default_models(default_models)
     opt_params = finder.run_grid_search(fitted_models, param_dict)
 

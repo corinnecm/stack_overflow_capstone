@@ -10,20 +10,26 @@ class DataCleaner(object):
     """
 
     def __init__(self, df, questions=True, training=True,
-                 simple_regression=True):
+                 simple_regression=True, time_split=True):
         self.df = df
         self.simple_regression = simple_regression
         self.questions = questions
+        self.time_split = time_split
 
-        # self.df['normed_score'] = self.df.score/self.df.view_count
-        indicies = xrange(len(df))
-        X_train, X_test = train_test_split(indicies, train_size=.8,
-                                           random_state=123)
-        training_data = self.df.iloc[X_train, :]
-        test_data = self.df.iloc[X_test, :]
+        if time_split:
+            self.df = self.df.sort_values('creation_date')
+            indicies = xrange(len(self.df))
+            split_index = len(self.df)*0.8
+            train_data = self.df.iloc[:split_index, :]
+            test_data = self.df.iloc[split_index:, :]
+
+        else:
+            X_train, X_test = train_test_split(indicies, train_size=.8, random_state=123)
+            train_data = self.df.iloc[X_train, :]
+            test_data = self.df.iloc[X_test, :]
 
         if training:
-            self.df = training_data
+            self.df = train_data
         else:  # testing
             print "Using test data"
             self.df = test_data
@@ -153,21 +159,33 @@ class DataCleaner(object):
             paragraphs.append(len(paragraph))
         self.df['num_paragraphs'] = paragraphs
 
+    def only_python_posts(self):
+        '''
+        Returns only the posts that have python as one of the tags.
+        '''
+        non_python = []
+        for idx, row in enumerate(self.df['tags_list']):
+            match = re.search(r"python", str(row))
+            if not match:
+                non_python.append(idx)
+        self.df.drop(self.df.index[non_python])
+
     def get_clean(self):
         '''
         Runs all pertinent cleaning methods.
         '''
+        dt_cols = ['creation_date']
+
         q_numeric_cols = ['id', 'accepted_answer_id', 'answer_count',
                           'comment_count', 'favorite_count', 'view_count']
         q_length_cols = ['body', 'title']
         q_drop_cols = ['id', 'accepted_answer_id', 'body', 'code', 'tags',
-                       'tags_list', 'title', 'creation_date']
-        q_dt_cols = ['creation_date']
+                       'tags_list', 'title']
 
         a_numeric_cols = ['id', 'answer_count', 'comment_count',
                           'favorite_count', 'view_count']
         a_length_cols = ['body']
-        a_drop_cols = ['id', 'body', 'code', 'parent_id', 'creation_date']
+        a_drop_cols = ['id', 'body', 'code', 'parent_id']
 
         if self.questions and self.simple_regression:
             self.transform_tags()
@@ -177,7 +195,7 @@ class DataCleaner(object):
             self.check_value_range(q_numeric_cols)
             self.add_length_cols(q_length_cols)
             self.dumify_code()
-            self.extract_month(q_dt_cols)
+            self.extract_month(dt_cols)
             self.num_paragraphs()
             self.only_numeric(q_drop_cols)
             # self.drop_leaky_columns()
@@ -188,7 +206,7 @@ class DataCleaner(object):
             self.check_value_range(a_numeric_cols)
             self.add_length_cols(a_length_cols)
             self.dumify_code()
-            self.extract_month(q_dt_cols)
+            self.extract_month(dt_cols)
             self.num_paragraphs()
             self.only_numeric(a_drop_cols)
 
