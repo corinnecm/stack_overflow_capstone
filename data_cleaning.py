@@ -19,7 +19,7 @@ class DataCleaner(object):
         if time_split:
             self.df = self.df.sort_values('creation_date')
             indicies = xrange(len(self.df))
-            split_index = int(len(self.df))*0.8
+            split_index = int(len(self.df)*0.8)
             train_data = self.df.iloc[:split_index, :]
             test_data = self.df.iloc[split_index:, :]
 
@@ -158,6 +158,16 @@ class DataCleaner(object):
             paragraph = re.findall("<p>", str(row))
             paragraphs.append(len(paragraph))
         self.df['num_paragraphs'] = paragraphs
+
+    def create_time_since_creation(self):
+        days_since = []
+        today = pd.to_datetime('2017-01-01 00:00:00')
+        for row in self.df['creation_date']:
+            days_since.append((today - row).days)
+        self.df['days_since_creation'] = days_since
+
+    def normalize_score(self):
+        pass
 
     def only_python_posts(self):
         '''
