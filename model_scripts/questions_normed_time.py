@@ -14,7 +14,7 @@ from model_tester import FindOptimalModels
 if __name__ == '__main__':
     q = create_questions_df(1000000)
     q_train_dc = DataCleaner(q, questions=True, training=True,
-                             simple_regression=True, time_split=True
+                             simple_regression=True, time_split=True,
                              normalize=True)
     X, y = q_train_dc.get_clean()
 
