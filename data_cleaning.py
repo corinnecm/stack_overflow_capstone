@@ -10,11 +10,12 @@ class DataCleaner(object):
     """
 
     def __init__(self, df, questions=True, training=True,
-                 simple_regression=True, time_split=True):
+                 simple_regression=True, time_split=True, normalize=True):
         self.df = df
         self.simple_regression = simple_regression
         self.questions = questions
         self.time_split = time_split
+        self.normalize = normalize
 
         if time_split:
             self.df = self.df.sort_values('creation_date')
@@ -106,11 +107,10 @@ class DataCleaner(object):
                 dummy.append(0)
         self.df['code_yn'] = dummy
 
-    def drop_leaky_columns(self):
+    def drop_leaky_columns(self, leaky_columns):
         '''
         Drop columns used to make the new y column to prevent leakage.
         '''
-        leaky_columns = ['score', 'view_count']
         for col in leaky_columns:
             self.df = self.df.drop(col, axis=1)
 
@@ -167,7 +167,7 @@ class DataCleaner(object):
         self.df['days_since_creation'] = days_since
 
     def normalize_score(self):
-        pass
+        self.df['normed_score'] = self.df['score']/self.df['days_since_creation']
 
     def only_python_posts(self):
         '''
@@ -185,6 +185,8 @@ class DataCleaner(object):
         Runs all pertinent cleaning methods.
         '''
         dt_cols = ['creation_date']
+        leaky_columns1 = ['score', 'view_count', 'creation_date']
+        leaky_columns2 = ['view_count', 'creation_date']
 
         q_numeric_cols = ['id', 'accepted_answer_id', 'answer_count',
                           'comment_count', 'favorite_count', 'view_count']
@@ -208,7 +210,6 @@ class DataCleaner(object):
             self.extract_month(dt_cols)
             self.num_paragraphs()
             self.only_numeric(q_drop_cols)
-            # self.drop_leaky_columns()
 
         elif not self.questions and self.simple_regression:  # if answers
             self.nan_to_zero()
@@ -224,8 +225,14 @@ class DataCleaner(object):
             self.text_parse()
             self.nlp_features()
 
-        # if training = True, y = y_train, X = X_train
-        y = self.df.pop('score')
-        X = self.df
+        if normalize:
+            self.normalize_score()
+            self.drop_leaky_columns(leaky_columns1)
+            y = self.df.pop('normed_score')
+            X = self.df
+        else:
+            self.drop_leaky_columns(leaky_columns2)
+            y = self.df.pop('score')
+            X = self.df
 
         return X, y
