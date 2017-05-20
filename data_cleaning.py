@@ -19,15 +19,12 @@ class DataCleaner(object):
 
         if time_split:
             self.df = self.df.sort_values('creation_date')
-            indicies = xrange(len(self.df))
             split_index = int(len(self.df)*0.8)
-            train_data = self.df.iloc[:split_index, :]
-            test_data = self.df.iloc[split_index:, :]
+            train_data = self.df[:split_index]
+            test_data = self.df[split_index:]
 
         else:
-            X_train, X_test = train_test_split(indicies, train_size=.8, random_state=123)
-            train_data = self.df.iloc[X_train, :]
-            test_data = self.df.iloc[X_test, :]
+            train_data, test_data = train_test_split(self.df, train_size=.8, random_state=123)
 
         if training:
             self.df = train_data
