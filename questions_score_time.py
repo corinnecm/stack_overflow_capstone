@@ -8,6 +8,7 @@ from sklearn.metrics import mean_squared_error, r2_score, f1_score
 from question_query import create_questions_df
 from answer_query import create_answers_df
 from data_cleaning import DataCleaner
+from model_tester import FindOptimalModels
 
 
 if __name__ == '__main__':

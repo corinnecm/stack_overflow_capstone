@@ -28,7 +28,6 @@ apt-get install python-psycopg2
 
 # for tmux
 export TERM=xterm >> /home/ubuntu/.bashrc
-source /home/ubuntu/.bashrc
 
 # capstone psycopg2/psql
 export USER='postgres'
