@@ -43,8 +43,7 @@ def create_questions_df(row_limit):
 
     questions_df = pd.DataFrame(cur.fetchall(), columns=['id', 'accepted_answer_id',
                         'answer_count', 'body', 'comment_count', 'favorite_count',
-                        'score', 'tags', 'title', 'view_count', 'bounty_amount',
-                        'creation_date'])
+                        'score', 'tags', 'title', 'view_count', 'creation_date'])
     conn.commit()
     cur.close()
     conn.close()

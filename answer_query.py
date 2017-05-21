@@ -41,7 +41,7 @@ def create_answers_df(row_limit):
 
     answers_df = pd.DataFrame(cur.fetchall(), columns=['id', 'body',
                                 'comment_count', 'parent_id', 'score',
-                                'view_count', 'bounty_amount', 'creation_date'])
+                                'view_count', 'creation_date'])
     conn.commit()
     cur.close()
     conn.close()
