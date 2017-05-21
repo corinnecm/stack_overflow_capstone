@@ -222,7 +222,7 @@ class DataCleaner(object):
             self.text_parse()
             self.nlp_features()
 
-        if normalize:
+        if self.normalize:
             self.normalize_score()
             self.drop_leaky_columns(leaky_columns1)
             y = self.df.pop('normed_score')

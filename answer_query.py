@@ -19,17 +19,22 @@ def create_answers_df(row_limit):
                             password=os.getenv('PASSWORD'),
                             dbname=os.getenv('DBNAME'))
     cur = conn.cursor()
-    answers_query = ("""SELECT posts.id, body, comment_count, parent_id, score,
-                        view_count, bounty_amount, posts.creation_date
-                        FROM posts
-                        JOIN votes
-                        ON posts.id = votes.post_id
-                        WHERE post_type_id=2
-                        ORDER BY RANDOM()
-                        LIMIT {};""").format(row_limit)
+    percent = row_limit/5e7*100
+    fast_sample = ("""SELECT id, body, comment_count, parent_id, score,
+                      view_count, creation_date
+                      FROM posts TABLESAMPLE SYSTEM ({})
+                      WHERE post_type_id=2;""").format(percent)
+    # answers_query = ("""SELECT posts.id, body, comment_count, parent_id, score,
+    #                     view_count, bounty_amount, posts.creation_date
+    #                     FROM posts
+    #                     JOIN votes
+    #                     ON posts.id = votes.post_id
+    #                     WHERE post_type_id=2
+    #                     ORDER BY RANDOM()
+    #                     LIMIT {};""").format(row_limit)
 
     try:
-        a = cur.execute(answers_query)
+        a = cur.execute(fast_sample)
     except Exception as e:
         print e.message
         conn.rollback()  # Rollback to prevent session locking out
