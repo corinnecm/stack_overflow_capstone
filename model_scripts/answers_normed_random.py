@@ -12,7 +12,7 @@ from model_tester import FindOptimalModels
 
 
 if __name__ == '__main__':
-    numrows = 1e4
+    numrows = 1e6
     print("Connecting and getting ~{}".format(numrows))
     a = create_answers_df(numrows)
     print("Got rows, cleaning data")
