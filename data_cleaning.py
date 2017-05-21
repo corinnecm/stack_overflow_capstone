@@ -2,6 +2,7 @@
 from datetime import datetime
 from sklearn.model_selection import train_test_split
 import re
+import pandas as pd
 
 
 class DataCleaner(object):
