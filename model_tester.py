@@ -129,7 +129,7 @@ class FindOptimalModels(object):
                 parameters for a certain model
         '''
         opt_models = []
-        self.opt_repot = []
+        self.opt_report = []
         for idx, mod in enumerate(self.default_models):
             model = mod(**self.optimal_params[idx])
             model.fit(self.X_train, self.y_train)
