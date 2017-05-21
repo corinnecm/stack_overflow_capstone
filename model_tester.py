@@ -130,7 +130,7 @@ class FindOptimalModels(object):
         '''
         opt_models = []
         for idx, mod in enumerate(self.default_models):
-            model = mod(**self.opt_params[idx])
+            model = mod(**self.optimal_params[idx])
             model.fit(self.X_train, self.y_train)
             predictions = model.predict(self.X_test)
             if self.question:
