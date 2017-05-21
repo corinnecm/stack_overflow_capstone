@@ -129,20 +129,21 @@ class FindOptimalModels(object):
                 parameters for a certain model
         '''
         opt_models = []
+        self.opt_repot = []
         for idx, mod in enumerate(self.default_models):
             model = mod(**self.optimal_params[idx])
             model.fit(self.X_train, self.y_train)
             predictions = model.predict(self.X_test)
             if self.question:
-                self.opt_report = ['Questions DF, model {} R-sq: {}'.format(idx,
+                self.opt_report.extend(['Questions DF, model {} R-sq: {}'.format(mod.__name__,
                        model.score(self.X_test, self.y_test)),
-                      'Questions DF, model {} MSE: {}'.format(idx,
-                       mean_squared_error(self.y_test, predictions))]
+                      'Questions DF, model {} MSE: {}'.format(mod.__name__,
+                       mean_squared_error(self.y_test, predictions))])
             else:
-                self.opt_report = ['Answers DF, model {} R-sq: {}'.format(idx,
+                self.opt_report.extend(['Answers DF, model {} R-sq: {}'.format(mod.__name__,
                        model.score(self.X_test, self.y_test)),
-                      'AnswersDF, model {} MSE: {}'.format(idx,
-                       mean_squared_error(self.y_test, predictions))]
+                      'AnswersDF, model {} MSE: {}'.format(mod.__name__,
+                       mean_squared_error(self.y_test, predictions))])
             opt_models.append(model)
         self.opt_models = opt_models
         return opt_models
