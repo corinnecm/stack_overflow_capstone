@@ -207,6 +207,7 @@ class DataCleaner(object):
             self.extract_month(dt_cols)
             self.num_paragraphs()
             self.only_numeric(q_drop_cols)
+            self.create_time_since_creation()
 
         elif not self.questions and self.simple_regression:  # if answers
             self.nan_to_zero()
@@ -217,6 +218,7 @@ class DataCleaner(object):
             self.extract_month(dt_cols)
             self.num_paragraphs()
             self.only_numeric(a_drop_cols)
+            self.create_time_since_creation()
 
         else:  # if not regression
             self.text_parse()
