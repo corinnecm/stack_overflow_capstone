@@ -33,3 +33,4 @@ if __name__ == '__main__':
     fitted_models = finder.run_default_models(default_models)
     print("starting grid search")
     opt_params = finder.run_grid_search(fitted_models, param_dict)
+    opt_results = finder.run_optimized_models()
