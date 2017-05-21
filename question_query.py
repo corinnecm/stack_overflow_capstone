@@ -36,7 +36,7 @@ def create_questions_df(row_limit):
     #                     LIMIT {};""").format(row_limit)
 
     try:
-        q = cur.execute(questions_query)
+        q = cur.execute(fast_sample)
     except Exception as e:
         print e.message
         conn.rollback()  # Rollback to prevent session locking out
