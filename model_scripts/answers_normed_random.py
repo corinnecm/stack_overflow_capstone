@@ -12,13 +12,13 @@ from model_tester import FindOptimalModels
 
 
 if __name__ == '__main__':
-    numrows = 1e5
+    numrows = 1e6
     print("Connecting and getting ~{}".format(numrows))
     a = create_answers_df(numrows)
+    print("Got rows, cleaning data")
     a_train_dc = DataCleaner(a, questions=False, training=True,
                              simple_regression=True, time_split=False,
                              normalize=True)
-    print("Got rows, cleaning data")
     A, b = a_train_dc.get_clean()
 
     default_models = [RandomForestRegressor, GradientBoostingRegressor]

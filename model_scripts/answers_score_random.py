@@ -12,7 +12,10 @@ from model_tester import FindOptimalModels
 
 
 if __name__ == '__main__':
-    a = create_answers_df(1000000)
+    numrows = 1e6
+    print("Connecting and getting ~{}".format(numrows))
+    a = create_answers_df(numrows)
+    print("Got rows, cleaning data")
     a_train_dc = DataCleaner(a, questions=False, training=True,
                              simple_regression=True, time_split=False,
                              normalize=False)
@@ -24,8 +27,9 @@ if __name__ == '__main__':
                   [2, 3, 5]},
                   'gbr': {'learning_rate': [.001, .01, .1, .2], 'max_depth':
                           [2, 3, 5], 'n_estimators': [50, 100, 5000]}}
-
+    print('Finding optimal models')
     finder = FindOptimalModels(A, b, question=False, time_split=False)
     finder.baseline_model()
     fitted_models = finder.run_default_models(default_models)
+    print("starting grid search")
     opt_params = finder.run_grid_search(fitted_models, param_dict)

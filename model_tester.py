@@ -56,6 +56,7 @@ class FindOptimalModels(object):
             R-sqared score and MSE for each model in models.
         '''
         fitted_models = []
+        self.default_models = default_models
         for idx, model in enumerate(default_models):
             mod = model()
             mod.fit(self.X_train, self.y_train)
@@ -71,6 +72,7 @@ class FindOptimalModels(object):
                       'AnswersDF, model {} MSE: {}'.format(idx,
                        mean_squared_error(self.y_test, rf_pred)))
             fitted_models.append(mod)
+        self.fitted_models = fitted_models
         return fitted_models
 
     def run_grid_search(self, model_list, params_dict):
@@ -99,6 +101,7 @@ class FindOptimalModels(object):
                               gs.best_params_))
             optimal_params.append(gs.best_params_)
         print output_msg
+        self.optimal_params = optimal_params
         return optimal_params
 
     def baseline_model(self):
@@ -115,16 +118,31 @@ class FindOptimalModels(object):
         print('Baseline MSE: ', mean_squared_error(self.y_test, y_pred))
 
 
-def run_optimized_models(model_list, optimal_params, X_test, X_train, y_test, y_train):
-    '''
-    Takes output from run_grid_search() and runs the optimal version of each
-    model.
+    def run_optimized_models(self):
+        '''
+        Takes output from run_grid_search() and runs the optimal version of each
+        model.
 
-    PARAMETERS:
-        model_list:
-        optimal_params: a list of dicts, each dict contains the optimal
-            parameters for a certain model
-    '''
-    for idx, mod in enumerate(model_list):
-        model = mod(opt_params[idx])
-    pass
+        PARAMETERS:
+            model_list:
+            optimal_params: a list of dicts, each dict contains the optimal
+                parameters for a certain model
+        '''
+        opt_models = []
+        for idx, mod in enumerate(self.default_models):
+            model = mod(**opt_params[idx])
+            model.fit(self.X_train, self.y_train)
+            predictions = model.predict(self.X_test)
+            if self.question:
+                self.opt_report = ['Questions DF, model {} R-sq: {}'.format(idx,
+                       model.score(self.X_test, self.y_test)),
+                      'Questions DF, model {} MSE: {}'.format(idx,
+                       mean_squared_error(self.y_test, predictions))]
+            else:
+                self.opt_report = ['Answers DF, model {} R-sq: {}'.format(idx,
+                       model.score(self.X_test, self.y_test)),
+                      'AnswersDF, model {} MSE: {}'.format(idx,
+                       mean_squared_error(self.y_test, predictions))]
+            opt_models.append(model)
+        self.opt_models = opt_models
+        return opt_models
