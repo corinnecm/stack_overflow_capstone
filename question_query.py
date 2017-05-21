@@ -21,8 +21,8 @@ def create_questions_df(row_limit):
     cur = conn.cursor()
     percent = row_limit/5e7*100
     fast_sample = ("""SELECT id, accepted_answer_id, answer_count, body,
-    #                     comment_count, favorite_count, score, tags, title,
-    #                     view_count, creation_date
+                      comment_count, favorite_count, score, tags, title,
+                      view_count, creation_date
                       FROM posts TABLESAMPLE SYSTEM ({})
                       WHERE post_type_id=1;""").format(percent)
     # questions_query = ("""SELECT posts.id, accepted_answer_id, answer_count, body,
