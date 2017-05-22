@@ -22,8 +22,7 @@ class FindOptimalModels(object):
             Sorts the columns by creation date and assigns the most recent 20
             percent to be the test set, the drops 'creation_date column.
             '''
-            self.X = self.X.sort_values('creation_date')
-            self.X = self.X.drop('creation_date', axis=1)
+            self.X = self.X.sort_values('days_since_creation', ascending=False)
             indicies = xrange(len(self.X))
             split_index = int(len(self.X)*0.8)
             X_train = self.X[:split_index]

@@ -1,0 +1,47 @@
+{
+  "asc_feature_importances_rf": [
+    "answer_count", 
+    "code_yn", 
+    "num_paragraphs", 
+    "num_tags", 
+    "favorite_count", 
+    "comment_count", 
+    "creation_date_month", 
+    "body_length", 
+    "title_length", 
+    "days_since_creation"
+  ], 
+  "opt_report": [
+    "Questions DF, model RandomForestRegressor R-sq: -0.00224202355555", 
+    "Questions DF, model RandomForestRegressor MSE: 2.49642351694e-05", 
+    "Questions DF, model GradientBoostingRegressor R-sq: -0.00515913014885", 
+    "Questions DF, model GradientBoostingRegressor MSE: 2.5036895598e-05"
+  ], 
+  "baseline": [
+    "Baseline R-squared: -3.02745", 
+    "Baseline MSE: 2.49091e-05"
+  ], 
+  "opt_params_gbr": {
+    "n_estimators": 5000, 
+    "learning_rate": 0.001, 
+    "max_depth": 2
+  }, 
+  "opt_model_gbr": "GradientBoostingRegressor(alpha=0.9, criterion='friedman_mse', init=None,\n             learning_rate=0.001, loss='ls', max_depth=2,\n             max_features=None, max_leaf_nodes=None,\n             min_impurity_split=1e-07, min_samples_leaf=1,\n             min_samples_split=2, min_weight_fraction_leaf=0.0,\n             n_estimators=5000, presort='auto', random_state=None,\n             subsample=1.0, verbose=0, warm_start=False)", 
+  "opt_model_rf": "RandomForestRegressor(bootstrap=True, criterion='mse', max_depth=2,\n           max_features='auto', max_leaf_nodes=None,\n           min_impurity_split=1e-07, min_samples_leaf=1,\n           min_samples_split=2, min_weight_fraction_leaf=0.0,\n           n_estimators=100, n_jobs=1, oob_score=False, random_state=None,\n           verbose=0, warm_start=False)", 
+  "opt_params_rf": {
+    "n_estimators": 100, 
+    "max_depth": 2
+  }, 
+  "asc_feature_importances_gbr": [
+    "code_yn", 
+    "comment_count", 
+    "answer_count", 
+    "num_paragraphs", 
+    "creation_date_month", 
+    "num_tags", 
+    "favorite_count", 
+    "body_length", 
+    "title_length", 
+    "days_since_creation"
+  ]
+}
