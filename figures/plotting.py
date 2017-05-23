@@ -5,9 +5,7 @@ from pandas.plotting import scatter_plot
 
 plt.switch_backend('png')
 
-frames = [finder.X_train, finder.y_train]
-
-df = pd.concat(frames, axis=1)
+df = pd.concat([finder.X_train, finder.y_train], axis=1)
 
 sm = scatter_matrix(df.sample(1000), alpha=0.3, figsize=(10, 10), diagonal='kde')
 
