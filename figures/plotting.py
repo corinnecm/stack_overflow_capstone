@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from pandas.plotting import scatter_plot
 
-plt.switch_backend('png')
+plt.switch_backend('pdf')
 
 df = pd.concat([finder.X_train, finder.y_train], axis=1)
 
