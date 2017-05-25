@@ -1,4 +1,3 @@
-# from bs4 import BeautifulSoup
 from datetime import datetime
 from sklearn.model_selection import train_test_split
 import re
@@ -15,8 +14,14 @@ class DataCleaner(object):
         training = True: bool, return training or testing data
         simple_regression = True: bool, keeps all features numeric,
                                     if False NLP features will be added
-        
+        time_split = False: bool, indicates to how train-test split the data
+        normalize = True: bool, indicates whether to normalize the data against
+                    days_since_creation
 
+    RETURNS:
+        Once DataCleaner.get_clean() is called
+        X: df, feature matrix
+        y: series, targets
     """
 
     def __init__(self, df, questions=True, training=True,
@@ -45,7 +50,7 @@ class DataCleaner(object):
 
     def extract_code_for_col(self):
         '''
-        From posts.body extract the text inside <code> tags and outputs a
+        From posts.body extract the text inside <code> tags and creates a
         new column.
         '''
         code_snips = []
@@ -59,7 +64,7 @@ class DataCleaner(object):
 
     def transform_tags(self):
         '''
-        From posts.tags transform the tags into a list of strings and outputs
+        From posts.tags transform the tags into a list of strings and creates
         a new column.
         '''
         tags = []
@@ -149,7 +154,7 @@ class DataCleaner(object):
 
     def num_tags(self):
         '''
-        Adds column that contains the number of tags per post.
+        Creates column that contains the number of tags per post.
         '''
         num_tags = []
         for tag in self.df['tags_list']:
@@ -158,7 +163,7 @@ class DataCleaner(object):
 
     def num_paragraphs(self):
         '''
-        Adds column that contains the number of paragraphs
+        Creates column that contains the number of paragraphs
         in the body of the post.
         '''
         paragraphs = []
@@ -168,6 +173,9 @@ class DataCleaner(object):
         self.df['num_paragraphs'] = paragraphs
 
     def create_time_since_creation(self):
+        '''
+        Creates new column from timestamp.
+        '''
         days_since = []
         today = pd.to_datetime('2017-01-01 00:00:00')
         for row in self.df['creation_date']:
@@ -175,6 +183,9 @@ class DataCleaner(object):
         self.df['days_since_creation'] = days_since
 
     def normalize_score(self):
+        '''
+        Normalizes the score over days since creation.
+        '''
         self.df['normed_score'] = self.df['score']/self.df['days_since_creation']
 
     def only_python_posts(self):

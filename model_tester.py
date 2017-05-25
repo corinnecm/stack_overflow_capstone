@@ -5,12 +5,23 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import mean_squared_error, r2_score, f1_score
 
-from question_query import create_questions_df
-from answer_query import create_answers_df
+from questions_query import create_questions_df
+from answers_query import create_answers_df
 from data_cleaning import DataCleaner
 
 
 class FindOptimalModels(object):
+    """
+    This class takes in cleaned data, runs given models with their default
+    parameters, performs grid search on those models to find their optimal
+    paramters, and then runs the models with those optimal parameters.
+
+    PARAMETERS:
+        X: df, feature matrix
+        y: series, labels/target values
+        question = True: bool, regarding the StackOverflow dataset
+        time_split = False: bool, indicates how to make the train-test split
+    """
     def __init__(self, X, y, question=True, time_split=False):
         self.X = X
         self.y = y
@@ -49,7 +60,7 @@ class FindOptimalModels(object):
 
         PARAMETERS:
             model_list: list of models/estimators, i.e. [RandomForestRegressor,
-            etc]
+                        etc]
 
         RETURNS:
             R-sqared score and MSE for each model in models.
@@ -87,7 +98,8 @@ class FindOptimalModels(object):
                         SAME ORDER AS MODEL LIST.
 
         RETURNS:
-            Best parameters for each model.
+            A list of strings containing an output message, and a list
+            of the best parameters for each model.
         '''
         output_msg = []
         optimal_params = []
@@ -109,23 +121,21 @@ class FindOptimalModels(object):
         normalized scores.
 
         RETURNS:
-            R-squared score and MSE for the baseline predictions.
+            Nothing, prints R-squared score and MSE for the baseline
+            predictions.
         '''
         avg_normed_score = self.y_train.mean()
         y_pred = [avg_normed_score for row in xrange(len(self.y_test))]
         print('Baseline R-squared: ', r2_score(self.y_test, y_pred))
         print('Baseline MSE: ', mean_squared_error(self.y_test, y_pred))
 
-
     def run_optimized_models(self):
         '''
-        Takes output from run_grid_search() and runs the optimal version of each
-        model.
+        Takes output from run_grid_search() and runs the optimal version of
+        each model.
 
-        PARAMETERS:
-            model_list:
-            optimal_params: a list of dicts, each dict contains the optimal
-                parameters for a certain model
+        RETURNS:
+            List of optimal models.
         '''
         opt_models = []
         self.opt_report = []
@@ -134,8 +144,8 @@ class FindOptimalModels(object):
             model.fit(self.X_train, self.y_train)
             predictions = model.predict(self.X_test)
             if self.question:
-                self.opt_report.extend(['Questions DF, model {} R-sq: {}'.format(mod.__name__,
-                       model.score(self.X_test, self.y_test)),
+                self.opt_report.extend(['Questions DF, model {} R-sq: {}'.format
+                                      (mod.__name__, model.score(self.X_test, self.y_test)),
                       'Questions DF, model {} MSE: {}'.format(mod.__name__,
                        mean_squared_error(self.y_test, predictions))])
             else:

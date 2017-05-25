@@ -1,6 +1,5 @@
 import matplotlib.pyplot as pyplot
 import pandas as pd
-import numpy as np
 from pandas.plotting import scatter_plot
 
 plt.switch_backend('pdf')
