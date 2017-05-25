@@ -3,16 +3,6 @@ import psycopg2
 import os
 import sys
 
-# if __name__ == '__main__':
-#     if os.path.exists('.env'):
-#             print('Detected local .env, importing environment from .env...')
-#             for line in open('.env'):
-#                 var = line.strip().split('=')
-#                 if len(var) == 2:
-#                     os.environ[var[0]] = var[1]
-#                     print "Setting environment variable:", var[0]
-#                     sys.stdout.flush()
-
 
 def create_questions_df(row_limit):
     conn = psycopg2.connect(user=os.getenv('USER'), host=os.getenv('HOST'),
@@ -25,16 +15,6 @@ def create_questions_df(row_limit):
                       view_count, creation_date
                       FROM posts TABLESAMPLE SYSTEM ({})
                       WHERE post_type_id=1;""").format(percent)
-
-    # questions_query = ("""SELECT posts.id, accepted_answer_id, answer_count, body,
-    #                     comment_count, favorite_count, score, tags, title,
-    #                     view_count, bounty_amount, posts.creation_date
-    #                     FROM posts
-    #                     JOIN votes
-    #                     ON posts.id = votes.post_id
-    #                     WHERE post_type_id=1
-    #                     ORDER BY RANDOM()
-    #                     LIMIT {};""").format(row_limit)
 
     try:
         q = cur.execute(fast_sample)
